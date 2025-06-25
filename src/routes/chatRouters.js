@@ -1,9 +1,10 @@
-const express = require("express");
-const { fetchMessage } = require("../controllers/chatController");
-const authenticateUser = require("../middlewares/authenticateUser");
+const express = require("express")
+const { fetchMessage, getLastMessages } = require("../controllers/chatController")
+const authenticateUser = require("../middlewares/authenticateUser")
 
-const router = express.Router();
+const router = express.Router()
 
-router.get("/message/:userId", authenticateUser, fetchMessage);
+router.get("/message/:userId", authenticateUser, fetchMessage)
+router.get("/last-messages", authenticateUser, getLastMessages)
 
-module.exports = router;
+module.exports = router
