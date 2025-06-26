@@ -128,7 +128,7 @@ const getUnreadCount = async (req, res) => {
       isRead: false,
     })
 
-    console.log(`Unread count from ${fromUserId} to ${currentUserId}: ${unreadCount}`) // Debug log
+    // console.log(`Unread count from ${fromUserId} to ${currentUserId}: ${unreadCount}`) // Debug log
 
     res.status(200).json({
       success: true,
