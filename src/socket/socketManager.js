@@ -592,14 +592,19 @@ const setupSocket = (io) => {
 
     // Call initiation
     socket.on("call-initiate", ({ to, from, callType }) => {
-      console.log(`📞 Call initiation: ${from} -> ${to} (${callType})`)
+      console.log(`📞 Call initiation received: ${from} -> ${to} (${callType})`)
+      console.log(`📞 Checking if user ${to} is online...`)
+
       const targetSocketId = activeUsers.get(to)
+      console.log(`📞 Target socket ID for ${to}:`, targetSocketId)
+
       if (targetSocketId) {
-        io.to(targetSocketId).emit("call-offer", { from, callType })
-        console.log(`📤 Call offer sent to ${to}`)
+        console.log(`📤 Sending incoming-call event to ${to}`)
+        io.to(targetSocketId).emit("incoming-call", { from, callType })
+        console.log(`✅ Incoming call event sent successfully`)
       } else {
+        console.log(`❌ User ${to} is not online`)
         socket.emit("call-failed", { reason: "User is not online" })
-        console.log(`❌ Call failed: User ${to} not online`)
       }
     })
 
@@ -608,8 +613,8 @@ const setupSocket = (io) => {
       console.log(`✅ Call accepted: ${from} -> ${to}`)
       const targetSocketId = activeUsers.get(to)
       if (targetSocketId) {
-        io.to(targetSocketId).emit("call-accept", { from })
-        console.log(`📤 Call accept sent to ${to}`)
+        io.to(targetSocketId).emit("call-accepted", { from })
+        console.log(`📤 Call accepted event sent to ${to}`)
       }
     })
 
@@ -618,8 +623,8 @@ const setupSocket = (io) => {
       console.log(`❌ Call rejected: ${from} -> ${to}`)
       const targetSocketId = activeUsers.get(to)
       if (targetSocketId) {
-        io.to(targetSocketId).emit("call-reject", { from })
-        console.log(`📤 Call reject sent to ${to}`)
+        io.to(targetSocketId).emit("call-rejected", { from })
+        console.log(`📤 Call rejected event sent to ${to}`)
       }
     })
 
@@ -628,8 +633,8 @@ const setupSocket = (io) => {
       console.log(`📞 Call ended: ${from} -> ${to}`)
       const targetSocketId = activeUsers.get(to)
       if (targetSocketId) {
-        io.to(targetSocketId).emit("call-end", { from })
-        console.log(`📤 Call end sent to ${to}`)
+        io.to(targetSocketId).emit("call-ended", { from })
+        console.log(`📤 Call ended event sent to ${to}`)
       }
     })
 
