@@ -230,46 +230,106 @@ const setupSocket = (io) => {
       }
     })
 
-    // Call Answer (Accepting a call)
-    socket.on("call_answer", ({ toUserId, answer }) => {
-      const targetSocketId = activeUsers.get(toUserId)
-      if (targetSocketId) {
-        io.to(targetSocketId).emit("call_answer", {
-          fromUserId: userId,
-          answer,
-        })
-      }
-    })
+    // // Call Answer (Accepting a call)
+    // socket.on("call_answer", ({ toUserId, answer }) => {
+    //   const targetSocketId = activeUsers.get(toUserId)
+    //   if (targetSocketId) {
+    //     io.to(targetSocketId).emit("call_answer", {
+    //       fromUserId: userId,
+    //       answer,
+    //     })
+    //   }
+    // })
 
-    // Call Accepted
-    socket.on("call_accepted", ({ toUserId }) => {
-      const targetSocketId = activeUsers.get(toUserId)
-      if (targetSocketId) {
-        io.to(targetSocketId).emit("call_accepted", {
-          fromUserId: userId,
-        })
-      }
-    })
+    // // Call Accepted
+    // socket.on("call_accepted", ({ toUserId }) => {
+    //   const targetSocketId = activeUsers.get(toUserId)
+    //   if (targetSocketId) {
+    //     io.to(targetSocketId).emit("call_accepted", {
+    //       fromUserId: userId,
+    //     })
+    //   }
+    // })
 
-    // Call Rejected
-    socket.on("call_rejected", ({ toUserId }) => {
-      const targetSocketId = activeUsers.get(toUserId)
-      if (targetSocketId) {
-        io.to(targetSocketId).emit("call_rejected", {
-          fromUserId: userId,
-        })
-      }
-    })
+    // // Call Rejected
+    // socket.on("call_rejected", ({ toUserId }) => {
+    //   const targetSocketId = activeUsers.get(toUserId)
+    //   if (targetSocketId) {
+    //     io.to(targetSocketId).emit("call_rejected", {
+    //       fromUserId: userId,
+    //     })
+    //   }
+    // })
 
-    // Call Ended
-    socket.on("call_ended", ({ toUserId }) => {
-      const targetSocketId = activeUsers.get(toUserId)
-      if (targetSocketId) {
-        io.to(targetSocketId).emit("call_ended", {
-          fromUserId: userId,
-        })
-      }
-    })
+    // // Call Ended
+    // socket.on("call_ended", ({ toUserId }) => {
+    //   const targetSocketId = activeUsers.get(toUserId)
+    //   if (targetSocketId) {
+    //     io.to(targetSocketId).emit("call_ended", {
+    //       fromUserId: userId,
+    //     })
+    //   }
+    // })
+
+      socket.on("initiate-call", ({ to, from, callType }) => {
+    const recipientSocketId = userSockets.get(to)
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("incoming-call", { from, callType })
+    } else {
+      socket.emit("call-failed", { reason: "User not available" })
+    }
+  })
+
+  socket.on("accept-call", ({ to, from }) => {
+    const callerSocketId = userSockets.get(to)
+    if (callerSocketId) {
+      io.to(callerSocketId).emit("call-accepted", { from })
+    }
+  })
+
+  socket.on("reject-call", ({ to, from }) => {
+    const callerSocketId = userSockets.get(to)
+    if (callerSocketId) {
+      io.to(callerSocketId).emit("call-rejected", { from })
+    }
+  })
+
+  socket.on("end-call", ({ to, from }) => {
+    const recipientSocketId = userSockets.get(to)
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("call-ended", { from })
+    }
+  })
+
+    socket.on("webrtc-offer", ({ to, offer }) => {
+    const recipientSocketId = userSockets.get(to)
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("webrtc-offer", {
+        offer,
+        from: socket.userId,
+      })
+    }
+  })
+
+  socket.on("webrtc-answer", ({ to, answer }) => {
+    const recipientSocketId = userSockets.get(to)
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("webrtc-answer", {
+        answer,
+        from: socket.userId,
+      })
+    }
+  })
+
+  socket.on("webrtc-ice-candidate", ({ to, candidate }) => {
+    const recipientSocketId = userSockets.get(to)
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("webrtc-ice-candidate", {
+        candidate,
+        from: socket.userId,
+      })
+    }
+  })
 
     // ICE Candidate Exchange
     socket.on("ice_candidate", ({ toUserId, candidate }) => {
