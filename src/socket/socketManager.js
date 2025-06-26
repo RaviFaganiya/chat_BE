@@ -272,7 +272,7 @@ const setupSocket = (io) => {
     // })
 
       socket.on("initiate-call", ({ to, from, callType }) => {
-    const recipientSocketId = userSockets.get(to)
+    const recipientSocketId = activeUsers.get(to)
     if (recipientSocketId) {
       io.to(recipientSocketId).emit("incoming-call", { from, callType })
     } else {
@@ -281,28 +281,28 @@ const setupSocket = (io) => {
   })
 
   socket.on("accept-call", ({ to, from }) => {
-    const callerSocketId = userSockets.get(to)
+    const callerSocketId = activeUsers.get(to)
     if (callerSocketId) {
       io.to(callerSocketId).emit("call-accepted", { from })
     }
   })
 
   socket.on("reject-call", ({ to, from }) => {
-    const callerSocketId = userSockets.get(to)
+    const callerSocketId = activeUsers.get(to)
     if (callerSocketId) {
       io.to(callerSocketId).emit("call-rejected", { from })
     }
   })
 
   socket.on("end-call", ({ to, from }) => {
-    const recipientSocketId = userSockets.get(to)
+    const recipientSocketId = activeUsers.get(to)
     if (recipientSocketId) {
       io.to(recipientSocketId).emit("call-ended", { from })
     }
   })
 
     socket.on("webrtc-offer", ({ to, offer }) => {
-    const recipientSocketId = userSockets.get(to)
+    const recipientSocketId = activeUsers.get(to)
     if (recipientSocketId) {
       io.to(recipientSocketId).emit("webrtc-offer", {
         offer,
@@ -312,7 +312,7 @@ const setupSocket = (io) => {
   })
 
   socket.on("webrtc-answer", ({ to, answer }) => {
-    const recipientSocketId = userSockets.get(to)
+    const recipientSocketId = activeUsers.get(to)
     if (recipientSocketId) {
       io.to(recipientSocketId).emit("webrtc-answer", {
         answer,
@@ -322,7 +322,7 @@ const setupSocket = (io) => {
   })
 
   socket.on("webrtc-ice-candidate", ({ to, candidate }) => {
-    const recipientSocketId = userSockets.get(to)
+    const recipientSocketId = activeUsers.get(to)
     if (recipientSocketId) {
       io.to(recipientSocketId).emit("webrtc-ice-candidate", {
         candidate,
